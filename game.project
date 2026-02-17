@@ -22,12 +22,11 @@ splash_image = /assets/splash_html5.png
 
 [project]
 title = Holey Moly
-version = 0.0.1
+version = 0.0.6
 publisher = Kuyi Mobile
 developer = Kuyi Mobile
 dependencies#0 = https://github.com/britzl/defold-orthographic/archive/2.6.0.zip
 dependencies#1 = https://github.com/britzl/gooey/archive/refs/tags/10.4.1.zip
-dependencies#2 = https://github.com/defold/extension-poki-sdk/archive/refs/tags/2.0.1.zip
 
 [physics]
 debug = 0

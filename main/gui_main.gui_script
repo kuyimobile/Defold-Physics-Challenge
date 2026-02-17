@@ -23,8 +23,6 @@ function on_message(self, message_id, message, sender)
 		self.S_HEIGHT = tonumber(sys.get_config_int( "display.height" ))
 		gui.set_enabled( gui.get_node( "root_levcom" ), false )
 		gui.set_enabled( gui.get_node( "root_levcom_sub" ), false )
-		gui.set_enabled( gui.get_node( "root_progress" ), false )
-		gui.set( gui.get_node( "btn_chest" ), "color", vmath.vector4( 222/255, 183/255, 29/255, 1 ) )
 		if ( constants.cur_screen == SCREEN_TITLE ) then
 			gui.set_enabled( gui.get_node( "root_title" ), true )
 		else
@@ -79,66 +77,6 @@ function on_message(self, message_id, message, sender)
 
 		local cur_level_sub = constants.cur_level_sub - ( message.result == RESULT_LOSS and 0 or 1 )
 		local cur_level_main = constants.cur_level_main - 1
-		--[[
-		if ( message.result == RESULT_WIN and not message.is_tutorial_level and cur_level_main < 7 ) then
-			gui.set_enabled( gui.get_node( "root_progress" ), true )
-			local node_bar_mask = gui.get_node( "bar_mask" )
-			local node_bar_fill = gui.get_node( "bar_fill" )
-			local node_chest = gui.get_node( "btn_chest" )
-			local node_reward = gui.get_node( "chest_reward" )
-			local node_dot = gui.get_node( "dot_" .. cur_level_sub )
-			local size = gui.get_size( node_bar_fill )
-			local segment = 45
-			local duration_fill = 0.5
-
-			-- reset properties
-			if ( cur_level_sub >= 3 and cur_level_main < 7 ) then
-				gui.set_enabled( gui.get_node( "btn_replay" ), false )
-			end
-			for i = 1, 3 do
-				gui.play_flipbook( gui.get_node( "dot_" .. i ), i < cur_level_sub and "chest_dot_star" or "chest_dot" )
-			end
-			gui.set( node_chest, "scale.y", 1 )
-			gui.play_flipbook( node_chest, "chest_closed" )
-			self.is_btn_chest_animating = false
-			
-			if ( cur_level_sub >= 3 and cur_level_main < 7 ) then
-				self.is_chest_enabled = true
-				msg.post( ".", "show_hint_chest" )
-			end
-			gui.set_enabled( node_reward, false )
-			gui.set_scale( node_reward, vmath.vector3( 0.1 ) )
-			
-			gui.set( node_bar_mask, "position.x", - size.x + ( cur_level_sub - 1 ) * segment )
-			gui.set( node_bar_fill, "position.x", size.x - ( cur_level_sub - 1 ) * segment )
-			gui.animate( node_bar_mask, "position.x", - size.x + cur_level_sub * segment, gui.EASING_LINEAR, duration_fill )
-			gui.animate( node_bar_fill, "position.x", size.x - cur_level_sub * segment, gui.EASING_LINEAR, duration_fill, 0, function() 
-				gui.play_flipbook( node_dot, "chest_dot_star" )
-				gui.set_scale( node_dot, vmath.vector3( 0.1 ) )
-				gui.animate( node_dot, "scale", 0.9, gui.EASING_OUTBACK, 0.2 )
-			end )
-		end
-		]]--
-	elseif ( message_id == hash( "open_chest" ) ) then
-		self.is_chest_enabled = false
-		local node_chest = gui.get_node( "btn_chest" )
-		local node_reward = gui.get_node( "chest_reward" )
-		local cur_level_sub = constants.cur_level_sub - ( message.result == RESULT_LOSS and 0 or 1 )
-		local cur_level_main = constants.cur_level_main - 1
-		gui.animate( node_chest, "scale.y", 0.5, gui.EASING_LINEAR, 0.15, 0.25, function()
-			sound.play( "/sounds#win", { delay = 0, gain = constants.SFX_GAIN } )
-			gui.play_flipbook( node_chest, "chest_open" )
-			gui.animate( node_chest, "scale.y", 1, gui.EASING_OUTBACK, 0.25 )
-			local pos_chest = gui.get_position( node_chest )
-			pos_chest.y = pos_chest.y + 42
-			gui.play_flipbook( gui.get_node( "chest_item" ), "chest_item" .. cur_level_main )
-			gui.set_enabled( node_reward, true )
-			gui.set_position( node_reward, pos_chest )
-			gui.animate( node_reward, "position.y", pos_chest.y + 90, gui.EASING_OUTCUBIC, 0.25, 0, function()
-				gui.set_enabled( gui.get_node( "btn_replay" ), true )
-			end )
-			gui.animate( node_reward, "scale", vmath.vector3( 1 ), gui.EASING_OUTCUBIC, 0.25 )
-		end )
 	elseif ( message_id == hash( "set_tutorial_mode" ) ) then
 		self.tutorial_mode = message.tutorial_mode
 		if ( self.tutorial_mode ~= TUT_NONE ) then
@@ -182,38 +120,6 @@ function on_message(self, message_id, message, sender)
 		animate_ring()
 	elseif ( message_id == hash( "hide_tutorial" ) ) then
 		gui.set_enabled( gui.get_node( "root_tutorial" ), false )
-	elseif ( message_id == hash( "show_hint_chest" ) and not self.is_btn_chest_animating ) then
-		self.is_btn_chest_animating = true
-		local node_chest = gui.get_node( "btn_chest" )
-		local duration = 0.05
-		local val = 10
-		local ctr = 10
-		local function wiggle_chest()
-			gui.animate( node_chest, "euler.z", val, gui.EASING_LINEAR, duration, 0, function() 
-				if ( val ~= 0 ) then
-					val = ctr <= 1 and 0 or val * -0.9
-				end
-				if ( ctr ~= 0 and self.is_btn_chest_animating ) then
-					ctr = ctr - 1
-					wiggle_chest()
-				else
-					self.is_btn_chest_animating = false
-					self.timer_chest = timer.delay( 1, false, function() 
-						msg.post( ".", "show_hint_chest" )
-					end )
-				end
-			end )
-		end
-		wiggle_chest()
-	elseif ( message_id == hash( "hide_hint_chest" ) ) then
-		local node_chest = gui.get_node( "btn_chest" )
-		self.is_btn_accel_animating = false
-		gui.cancel_animation( node_chest, "euler.z" )
-		gui.set( node_chest, "euler.z", 0 )
-		if ( self.timer_chest ) then
-			timer.cancel( self.timer_chest )
-			self.timer_chest = nil
-		end
 	elseif ( message_id == hash( "show_hint_accel" ) and not self.is_btn_accel_animating ) then
 		local node_accel = gui.get_node( "btn_accel" )
 		gui.cancel_animation( node_accel, "position.x" )
@@ -249,7 +155,7 @@ function on_message(self, message_id, message, sender)
 	elseif ( message_id == hash( "clear_level" ) ) then
 		gui.set_enabled( gui.get_node( "root_levcom" ), false )
 		gui.set_enabled( gui.get_node( "root_levcom_sub" ), false )
-		gui.set_enabled( gui.get_node( "root_progress" ), false )
+		--gui.set_enabled( gui.get_node( "root_progress" ), false )
 	end
 end
 
@@ -317,17 +223,6 @@ function on_input(self, action_id, action)
 				end
 			end
 		end, update_button )
-
-		gooey.button( "btn_chest", action_id, action, function( button )
-			if ( button.released_now and self.is_chest_enabled ) then
-				msg.post( ".", "hide_hint_chest" )
-				msg.post( ".", "open_chest" )
-			end
-		end, function ( button) 
-			if button.pressed_now and self.is_chest_enabled then
-				sound.play( "/sounds#click", { delay = 0, gain = constants.SFX_GAIN } )
-			end
-		end )
 	elseif ( constants.cur_screen == SCREEN_TITLE ) then
 		gooey.button( "btn_play", action_id, action, function( button )
 			if ( button.released_now ) then

@@ -416,7 +416,6 @@ function on_message(self, message_id, message, sender)
 	elseif ( message_id == hash( "check_dummy" ) ) then
 		self.game_status = STATUS_END
 		local did_win = get_level_result( self )
-		utils.stop_poki()
 
 		local is_level_main = false
 		local is_tutorial_level = self.is_tutorial_level
@@ -440,7 +439,6 @@ function on_message(self, message_id, message, sender)
 			else
 				sound.play( "/sounds#win", { delay = 0, gain = constants.SFX_GAIN } )
 				timer.delay( is_tutorial_level and 1.5 or 2, false, function() 
-					utils.start_poki()
 					reset_level( self )
 				end )
 			end
@@ -459,7 +457,6 @@ function on_message(self, message_id, message, sender)
 			msg.post( constants.dummy_script, "cancel_alpha" )
 		end
 	elseif ( message_id == hash( "reset_level" ) ) then
-		utils.start_poki()
 		reset_level( self )
 	elseif ( message_id == hash( "reset_dummy" ) and self.game_status == STATUS_ACTIVE ) then
 		clear_dummy( self )
@@ -467,11 +464,9 @@ function on_message(self, message_id, message, sender)
 	elseif ( message_id == hash( "accel_wall" ) and self.game_status == STATUS_ACTIVE ) then
 		animate_wall( self, true )
 	elseif ( message_id == hash( "pause_game" ) ) then
-		utils.stop_poki()
 		clear_level( self )
 	elseif ( message_id == hash( "resume_game" ) ) then
 		--sound.play( "/sounds#mus_main", { delay = 0, gain = constants.MUS_GAIN } )
-		utils.start_poki()
 		create_level( self )
 	end
 end

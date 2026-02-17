@@ -65,15 +65,6 @@ images {
   image: "/assets/wall_lose.png"
 }
 images {
-  image: "/assets/chest_dot.png"
-}
-images {
-  image: "/assets/chest_open.png"
-}
-images {
-  image: "/assets/chest_closed.png"
-}
-images {
   image: "/assets/chest_item1.png"
 }
 images {
@@ -92,22 +83,7 @@ images {
   image: "/assets/chest_item6.png"
 }
 images {
-  image: "/assets/chest_dot_star.png"
-}
-images {
   image: "/assets/chest_reward_bg.png"
-}
-images {
-  image: "/assets/chest_bar_mask.png"
-}
-images {
-  image: "/assets/chest_bar_bg.png"
-}
-images {
-  image: "/assets/chest_bar_fill.png"
-}
-images {
-  image: "/assets/chest_dot_mask.png"
 }
 animations {
   id: "logo"

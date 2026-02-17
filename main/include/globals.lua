@@ -1,42 +1,7 @@
 --[[
-Started dev on: Feb 1, 2025
-Playtested on Poki on: Feb 21, 2025
+Submitted to Defold Challenge #5: Break It!
 
-version 0.0.2
-- Fixed BUG: Do drag foot tutorial, click Home button, go back to game, level resets
-- Replaced "retry" button icon and "reset dummy" button icon
-- Added sfx for release body part, sublevel wins, wall thud
-- Added more delay on sublevel transition
-- Added background music
-
-version 0.0.3
-- Set a default dummy face
-- Add corner/bottom confetti on sublevel wins
-- Color wall green on win and red on lose
-- Restore dummy alpha on level complete
-
-version 0.0.4
-- Unlock reskins every main level
-- Add animated ring to first tutorial
-
-version 0.0.4b
-- Move animated ring with hand
-- Increase margin of error during tutorial
-
-version 0.0.4c
-- Show hint for speeding up wall
-- Update dummy head and wall color change
-- Revise rotation checker
-
-version 0.0.5
-- Add progress bar and chest unlocks
-- Fix shadow not updating when limb continues to rotate into position after releasing body.
-- Fix dummy reset triggering alpha animation
-
-version 0.0.6
-- Removed extra GUI for Defold Challenge submission
-- Disabled chest + rewards to simplify game
-- Removed music because it was already used for Tower Merge
+I started this project to study and experiment with Defold's joints and physics.
 
 ]]--
 

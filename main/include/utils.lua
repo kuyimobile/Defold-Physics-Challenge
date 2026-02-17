@@ -6,24 +6,6 @@
 local G = {}
 G.formatted_number = 0
 
-function G.start_poki()
-	-- Needed for Poki playtesting
-	local info = sys.get_sys_info()
-	if info.system_name == "HTML5" then
-		-- We are running in a browser.
-		poki_sdk.gameplay_start()
-	end
-end
-
-function G.stop_poki()
-	-- Needed for Poki playtesting
-	local info = sys.get_sys_info()
-	if info.system_name == "HTML5" then
-		-- We are running in a browser.
-		poki_sdk.gameplay_stop()
-	end
-end
-
 function G.shuffle( t )
 	for i = #t, 2, -1 do
 		local j = math.random(i)
