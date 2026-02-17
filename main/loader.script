@@ -1,0 +1,31 @@
+math.randomseed( os.time() )
+constants = require( "main.include.globals" )
+utils = require( "main.include.utils" )
+
+
+local function show(self, proxy)
+	if self.current_proxy then
+		msg.post( self.current_proxy, "unload" )
+		self.current_proxy = nil
+	end
+	msg.post( proxy, "async_load" )
+end
+
+function init(self)
+	--msg.post( "@system:", "toggle_physics_debug" )
+	msg.post( "@render:", "use_fixed_fit_projection", { near = -1, far = 1 } )
+	msg.post( ".", "acquire_input_focus" )
+	self.current_proxy = nil
+	msg.post( ".", "show_game" )
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash( "show_game" ) then
+		show( self, "#proxy_main" )
+	elseif message_id == hash( "proxy_loaded" ) then
+		self.current_proxy = sender
+		msg.post( sender, "enable" )
+	elseif message_id == hash( "proxy_unloaded" ) then
+		print( "unloaded", sender )
+	end
+end

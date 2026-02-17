@@ -1,0 +1,540 @@
+go.property( "type", 1 )
+go.property( "scale", 1 )
+
+
+local cursor = require "main.include.cursor"
+
+local rightshoulder = "rightshoulder#collisionobject"
+local rightupperarm = "rightupperarm#collisionobject"
+local rightlowerarm = "rightlowerarm#collisionobject"
+local righthand = "righthand#collisionobject"
+local leftshoulder = "leftshoulder#collisionobject"
+local leftupperarm = "leftupperarm#collisionobject"
+local leftlowerarm = "leftlowerarm#collisionobject"
+local lefthand = "lefthand#collisionobject"
+local lefthip = "lefthip#collisionobject"
+local leftupperleg = "leftupperleg#collisionobject"
+local leftlowerleg = "leftlowerleg#collisionobject"
+local leftfoot = "leftfoot#collisionobject"
+local righthip = "righthip#collisionobject"
+local rightupperleg = "rightupperleg#collisionobject"
+local rightlowerleg = "rightlowerleg#collisionobject"
+local rightfoot = "rightfoot#collisionobject"
+local hips = "hip#collisionobject"
+local body_k = "body#collisionobject_kinematic"
+local head_d = "head#collisionobject_dynamic"
+local body_d = "body#collisionobject_dynamic"
+local head_k = "head#collisionobject_kinematic"
+local neck_body = "neck_body#collisionobject"
+local forehead = "forehead#collisionobject"
+local neck_head = "neck_head#collisionobject"
+
+local list_sprite = { "body", "body#sprite_head", "leftlowerarm", "leftupperarm", "rightlowerarm", "rightupperarm", 
+"leftlowerleg", "leftupperleg", "rightlowerleg", "rightupperleg" }
+
+local list_parts = { "body", "head", "leftfoot", "rightfoot", "lefthand", "righthand" }
+
+local function get_part_name( self, target_id )
+	local dum_ids = constants.dummy_ids
+	for i = 1, #list_parts do
+		local id = hash( "/" .. list_parts[i] )
+		if ( dum_ids[id] == target_id ) then
+			return list_parts[i]
+		end
+	end
+	return nil
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	msg.post( ".", "delay_init" )
+end
+
+function update(self, dt)
+	if ( self.status == 0 and self.type == 1 ) then
+		msg.post( ".", "move_silhouette" )
+		--msg.post( ".", "move_mask" )
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if ( message_id == hash( "delay_init" ) ) then
+		-- Get screen width and height
+		self.S_WIDTH = tonumber(sys.get_config_int( "display.width" ))
+		self.S_HEIGHT = tonumber(sys.get_config_int( "display.height" ))
+		self.status = 0
+
+		self.scale = 1.0
+		self.tag = "dummy"
+		
+		-- Silhouette settings go here
+		if ( self.type == 2 ) then
+			self.tag = "instance"
+
+			local sil_transparency = 128/255
+			go.set( "body#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "head#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "leftupperarm#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "leftlowerarm#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "rightupperarm#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "rightlowerarm#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "leftupperleg#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "leftlowerleg#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "rightupperleg#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			go.set( "rightlowerleg#sprite", "tint", vmath.vector4( 255/255, 255/255, 255/255, sil_transparency ) )
+			
+			-- Store silhouette pos
+			constants.sil_pos = go.get_position( constants.silhouette_ids[hash("/body")] )
+		elseif ( self.type == 1 ) then
+			-- Store dummy pos
+			constants.dummy_pos = go.get_position( constants.dummy_ids[hash("/body")] )
+
+			-- Testing reskin
+			sprite.play_flipbook( "body#sprite_head", "dummy_head2" )
+			local level = constants.cur_level_main
+			if ( level >= 2 ) then
+				print("sprite shirt")
+				sprite.play_flipbook( "body#sprite", "dummy_body2" )
+				sprite.play_flipbook( "leftupperarm#sprite", "dummy_left_arm_top2" )
+				sprite.play_flipbook( "rightupperarm#sprite", "dummy_right_arm_top2" )
+			end
+			if ( level >= 3 ) then
+				print("sprite pants")
+				sprite.play_flipbook( "rightupperleg#sprite", "dummy_right_leg_top2" )
+				sprite.play_flipbook( "leftupperleg#sprite", "dummy_left_leg_top2" )
+			end
+			if ( level >= 4 ) then
+				print("sprite shoes")
+				sprite.play_flipbook( "rightlowerleg#sprite", "dummy_right_leg_bottom2" )
+				sprite.play_flipbook( "leftlowerleg#sprite", "dummy_left_leg_bottom2" )
+			end
+			if ( level >= 5 ) then
+				print("sprite watch")
+				sprite.play_flipbook( "rightlowerarm#sprite", "dummy_right_arm_bottom2" )
+			end
+			if ( level >= 7 ) then
+				sprite.play_flipbook( "body#sprite_head", "dummy_head4" )
+			elseif ( level >= 6 ) then
+				sprite.play_flipbook( "body#sprite_head", "dummy_head3" )
+			end
+
+			self.joints = {
+				lefthand = "leftlowerarm",
+				righthand = "rightlowerarm",
+				leftfoot = "leftlowerleg",
+				rightfoot = "rightlowerleg"
+			}
+			local list = { "lefthand", "righthand", "leftfoot", "rightfoot" }
+			--local list = { "leftlowerarm", "rightlowerarm", "leftlowerleg", "rightlowerleg" }
+			for i = 1, #list do
+				go.set( list[i] .. "#sprite", "tint.w", 0 )
+				--go.set( list[i] .. "#sprite_marker", "tint.w", 0 )
+			end
+
+			msg.post( body_d, "disable" )
+			msg.post( head_k, "disable" )
+
+			-- Connect right arm from hand to shoulder
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			rightshoulder,
+			"rightshoulder",
+			vmath.vector3(0),
+			rightupperarm,
+			vmath.vector3(0, 30, 0),
+			{
+				enable_limit = true,
+				lower_angle = math.rad(15),
+				upper_angle = math.rad(165)
+			})
+
+			--pprint(physics.get_joint_properties(rightshoulder, "rightshoulder"))
+
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			rightupperarm,
+			"rightupperarm",
+			vmath.vector3(0, -35, 0),
+			rightlowerarm,
+			vmath.vector3(0, 35, 0))
+
+			physics.create_joint(
+			physics.JOINT_TYPE_FIXED,
+			righthand,
+			"righthand",
+			vmath.vector3(0, 0, 0),
+			rightlowerarm,
+			vmath.vector3(0, -35, 0),
+			{ max_length = 1 })
+
+			-- Connect left arm from hand to shoulder
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			leftshoulder,
+			"leftshoulder",
+			vmath.vector3(0),
+			leftupperarm,
+			vmath.vector3(0, 30, 0),
+			{
+				enable_limit = true,
+				lower_angle = math.rad(-165),
+				upper_angle = math.rad(-15)
+			})
+
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			leftupperarm,
+			"leftupperarm",
+			vmath.vector3(0, -35, 0),
+			leftlowerarm,
+			vmath.vector3(0, 35, 0))
+			
+			physics.create_joint(
+			physics.JOINT_TYPE_FIXED,
+			lefthand,
+			"lefthand",
+			vmath.vector3(0, 0, 0),
+			leftlowerarm,
+			vmath.vector3(0, -35, 0))
+			
+			-- Connect left leg from foot to hip
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			lefthip,
+			"lefthip",
+			vmath.vector3(0),
+			leftupperleg,
+			vmath.vector3(0, 30, 0),
+			{
+				enable_limit = true,
+				lower_angle = math.rad(-135),
+				upper_angle = math.rad(0)
+			})
+
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			leftupperleg,
+			"leftupperleg",
+			vmath.vector3(0, -35, 0),
+			leftlowerleg,
+			vmath.vector3(0, 35, 0),
+			{
+				enable_limit = true,
+				lower_angle = math.rad(0),
+				upper_angle = math.rad(135)
+			})
+
+			physics.create_joint(
+			physics.JOINT_TYPE_FIXED,
+			leftfoot,
+			"leftfoot",
+			vmath.vector3(0, 0, 0),
+			leftlowerleg,
+			vmath.vector3(0, -35, 0),
+			{ max_length = 1 })
+
+			-- Connect right leg from foot to hip
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			righthip,
+			"righthip",
+			vmath.vector3(0),
+			rightupperleg,
+			vmath.vector3(0, 30, 0),
+			{
+				enable_limit = true,
+				lower_angle = math.rad(0),
+				upper_angle = math.rad(135)
+			})
+
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			rightupperleg,
+			"rightupperleg",
+			vmath.vector3(0, -35, 0),
+			rightlowerleg,
+			vmath.vector3(0, 35, 0),
+			{
+				enable_limit = true,
+				lower_angle = math.rad(-135),
+				upper_angle = math.rad(0)
+			})
+			--pprint(physics.get_joint_properties(rightupperleg, "rightupperleg"))
+
+			physics.create_joint(
+			physics.JOINT_TYPE_FIXED,
+			rightfoot,
+			"rightfoot",
+			vmath.vector3(0, 0, 0),
+			rightlowerleg,
+			vmath.vector3(0, -35, 0),
+			{ max_length = 1 })
+
+			--pprint(physics.get_joint_properties(rightfoot, "rightfoot"))
+
+			-- Connect hip to legs
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			body_k,
+			"hip_right",
+			vmath.vector3(0),
+			righthip,
+			vmath.vector3(0, 0, 0))
+
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			body_k,
+			"hip_left",
+			vmath.vector3(0),
+			lefthip,
+			vmath.vector3(0, 0, 0))
+			
+			--
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			body_k,
+			"neck_body",
+			vmath.vector3(0),
+			neck_body,
+			vmath.vector3(0, 0, 0))
+			--]]
+			
+			-- Connect head to body
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			neck_body,
+			"neck_body",
+			vmath.vector3(0),
+			head_d,
+			vmath.vector3(0, 0, 0))
+			--]]
+			self.joint_neck_body = true
+
+			--[[ Connect body to head
+			physics.create_joint(
+			physics.JOINT_TYPE_HINGE,
+			neck_head,
+			"neck_head",
+			vmath.vector3(0, 0, 0),
+			body_d,
+			vmath.vector3(0, 70, 0),
+			{
+
+			})
+			--]]
+		end
+	elseif ( message_id == hash( "choose_bodypart" ) ) then
+		if ( message.part_id ~= nil ) then
+			-- do string handling to get part name
+			local bodypart_target = get_part_name( self, message.part_id )
+			constants.bodypart_selected = bodypart_target
+			print( "press on " .. bodypart_target .. " part id: " .. message.part_id )
+			if ( self.is_tutorial ) then
+				
+			elseif ( bodypart_target == "head" ) then
+				if ( self.joint_neck_body ) then
+					physics.destroy_joint( neck_body, "neck_body" )
+					self.joint_neck_body = nil
+				end
+
+				msg.post( body_k, "disable" )
+				msg.post( head_d, "disable" )
+				msg.post( body_d, "enable" )
+				msg.post( head_k, "enable" )
+
+				-- Connect body to head
+				if ( not self.joint_neck_head ) then
+					self.joint_neck_head = true
+					physics.create_joint(
+					physics.JOINT_TYPE_HINGE,
+					neck_head,
+					"neck_head",
+					vmath.vector3(0, 0, 0),
+					body_d,
+					vmath.vector3(0, 70, 0),
+					{
+						
+					})
+				end
+			elseif ( bodypart_target ) then
+				if ( self.joint_neck_head ) then
+					physics.destroy_joint( neck_head, "neck_head" )
+					self.joint_neck_head = nil
+				end
+
+				msg.post( body_d, "disable" )
+				msg.post( head_k, "disable" )
+				msg.post( body_k, "enable" )
+				msg.post( head_d, "enable" )
+
+				-- Connect head to body
+				if ( not self.joint_neck_body ) then
+					self.joint_neck_body = true
+					physics.create_joint(
+					physics.JOINT_TYPE_HINGE,
+					neck_body,
+					"neck_body",
+					vmath.vector3(0),
+					head_d,
+					vmath.vector3(0, 0, 0))
+				end
+			end
+		end
+	elseif ( message_id == hash( "release_bodypart" ) and ( constants.bodypart_selected or message.bodymain ) ) then
+		sound.play( "/sounds#release", { delay = 0, gain = constants.SFX_GAIN } )
+		local bodymain = message.bodymain and message.bodymain or constants.bodypart_selected
+		print( "release on " .. bodymain )
+		local bodytarget = self.joints[bodymain]
+		if ( bodymain == "body" or bodymain == "head" ) then
+			for k, v in pairs( self.joints ) do
+				msg.post( ".", "release_bodypart", { bodymain = k } )
+			end
+			if ( bodymain == "body" ) then
+				self.status = 0
+				self.timer_mimic = timer.delay( 3, false, function() 
+					self.timer_mimic = nil
+					self.status = 1
+				end )
+			end
+		elseif ( bodytarget ) then
+			--msg.post( bodytarget .. "#collisionobject", "disable" )
+			physics.destroy_joint( bodymain .. "#collisionobject", bodymain )
+			msg.post( ".", "rework_joint", { bodymain = bodymain } )
+		end
+	elseif ( message_id == hash( "rework_joint" ) ) then
+		local bodymain = message.bodymain
+		local bodytarget = self.joints[bodymain]
+		local rot = go.get( bodytarget, "euler.z" )
+		local val_x = math.sin(math.rad(rot)) * 35
+		local val_y = math.cos(math.rad(rot)) * 35
+		local pos_world = go.get_world_position( bodytarget )
+		pos_world.x = pos_world.x + val_x
+		pos_world.y = pos_world.y - val_y
+		go.set_position( pos_world, bodymain )
+		--msg.post( bodytarget .. "#collisionobject", "enable" )
+		
+		physics.create_joint(
+		physics.JOINT_TYPE_FIXED,
+		bodymain .. "#collisionobject",
+		bodymain,
+		vmath.vector3(0, 0, 0),
+		bodytarget .. "#collisionobject",
+		vmath.vector3(0, -35, 0),
+		{ max_length = 1 })
+	elseif ( message_id == hash( "start_silhouette" ) ) then
+		self.status = 1
+	elseif ( message_id == hash( "move_silhouette" ) ) then
+		if ( message.is_touch_event ) then
+			if ( self.timer_mimic ) then
+				timer.cancel( self.timer_mimic )
+				self.timer_mimic = nil
+			end
+			self.status = 1
+		end
+		if ( self.status == 1 or not message.is_touch_event ) then
+			local dum_ids = constants.dummy_ids
+			local sil_ids = constants.silhouette_ids
+			local bodyparts = constants.BODYPARTS
+			if ( dum_ids and sil_ids and constants.sil_pos ) then
+				for i = 1, #bodyparts do
+					local k = hash("/" .. bodyparts[i])
+					if ( dum_ids[k] and sil_ids[k] ) then
+						local v = dum_ids[k]
+						local pos = go.get_position( v )
+						local sil_x = constants.sil_pos.x - ( ( constants.dummy_pos.x - pos.x ) )
+						local sil_y = constants.sil_pos.y - ( ( constants.dummy_pos.y - pos.y ) )
+						local new_pos = vmath.vector3( sil_x, sil_y, pos.z )
+						go.set( sil_ids[k], "euler.z", go.get( v, "euler.z" ) )
+						go.set_position( new_pos, sil_ids[k] )
+					end
+				end
+			end
+		end
+	elseif ( message_id == hash( "capture_pose" ) ) then
+		local sil_ids = constants.silhouette_ids
+		local bodyparts = constants.BODYPARTS
+		local pose = {}
+		if ( sil_ids ) then
+			for i = 1, #bodyparts do
+				local v = sil_ids[hash("/" .. bodyparts[i])]
+				if ( v ) then
+					local part_data = {}
+					pose[bodyparts[i]] = part_data
+					local pos = go.get_position( v )
+					part_data.pos = { utils.round( pos.x, 2 ), utils.round( pos.y, 2 ) }
+					part_data.rot = utils.round ( go.get( v, "euler.z" ), 2 )
+				end
+			end
+		end	
+		local str = json.encode(pose)
+		str = string.gsub( str, '"', "" )
+		str = string.gsub( str, ":", "=" )
+		str = string.gsub( str, "%[", "{" )
+		str = string.gsub( str, "%]", "}" )
+		pprint( str )
+	elseif ( message_id == hash( "load_pose" ) ) then
+		local pose = ( constants.pose_debug or not constants.pose_index ) and constants.pose_default or constants.poses[constants.pose_index]
+		local mask_ids = constants.mask_ids
+		local bodyparts = constants.BODYPARTS
+
+		if ( mask_ids ) then
+			for i = 1, #bodyparts do
+				local k = hash("/" .. bodyparts[i])
+				if ( pose[bodyparts[i]] and mask_ids[k] ) then
+					local pos = pose[bodyparts[i]].pos
+					go.set_position( vmath.vector3( pos[1], pos[2], 1 ), mask_ids[k] )
+					go.set( mask_ids[k], "euler.z", pose[bodyparts[i]].rot )
+				end
+			end
+		end
+	elseif ( message_id == hash( "move_mask" ) ) then
+		local dum_ids = constants.dummy_ids
+		local mask_ids = constants.mask_ids
+		local bodyparts = constants.BODYPARTS
+
+		if ( dum_ids and mask_ids and constants.sil_pos ) then
+			--for k, v in pairs( dum_ids ) do
+			for i = 1, #bodyparts do
+				local k = hash("/" .. bodyparts[i])
+				if ( dum_ids[k] and mask_ids[k] ) then
+					local v = dum_ids[k]
+					local pos = go.get_position( v )
+					local sil_x = constants.sil_pos.x - ( ( constants.dummy_pos.x - pos.x ) )
+					local sil_y = constants.sil_pos.y - ( ( constants.dummy_pos.y - pos.y ) )
+					local new_pos = vmath.vector3( sil_x, sil_y, pos.z )
+					go.set( mask_ids[k], "euler.z", go.get( v, "euler.z" ) )
+					go.set_position( new_pos, mask_ids[k] )
+				end
+			end
+		end
+	elseif ( message_id == hash( "set_alpha" ) ) then
+		for i = 1, #list_sprite do
+			--go.set( string.find( list[i], "#sprite") and list[i] or list[i] .. "#sprite", "tint.w", 0.5 )
+			local url = string.find( list_sprite[i], "#sprite") and list_sprite[i] or list_sprite[i] .. "#sprite"
+			local duration = 2
+			local new_val = 0.5
+			if ( message.val ) then
+				go.set( url, "tint.w", message.val )
+				duration = ( message.val - new_val ) / new_val * duration
+			end
+			go.animate( url, "tint.w", go.PLAYBACK_ONCE_FORWARD, new_val, go.EASING_LINEAR, duration )
+		end
+	elseif ( message_id == hash( "cancel_alpha" ) ) then
+		for i = 1, #list_sprite do
+			local url = string.find( list_sprite[i], "#sprite") and list_sprite[i] or list_sprite[i] .. "#sprite"
+			go.cancel_animations( url, "tint.w" )
+			go.set( url, "tint.w", 1 )
+		end
+	elseif ( message_id == hash( "disable_dummy" ) ) then
+		msg.post( body_k, "disable" )
+		msg.post( head_k, "disable" )
+		msg.post( head_d, "disable" )
+		msg.post( righthand, "disable" )
+		msg.post( lefthand, "disable" )
+		msg.post( rightfoot, "disable" )
+		self.is_tutorial = message.is_tutorial
+		if ( not message.is_tutorial ) then
+			msg.post( leftfoot, "disable" )
+		end
+	end
+end

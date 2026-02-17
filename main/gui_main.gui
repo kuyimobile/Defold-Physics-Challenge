@@ -1,0 +1,533 @@
+script: "/main/gui_main.gui_script"
+fonts {
+  name: "font_default"
+  font: "/main/fonts/font_default.font"
+}
+fonts {
+  name: "font_big"
+  font: "/main/fonts/font_big.font"
+}
+textures {
+  name: "gui"
+  texture: "/main/atlas/gui.atlas"
+}
+nodes {
+  position {
+    x: 235.0
+    y: 418.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "root_gui"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    x: -190.0
+    y: -370.0
+  }
+  type: TYPE_BOX
+  texture: "gui/btn_reset"
+  id: "btn_reset"
+  parent: "root_gui"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 190.0
+    y: -370.0
+  }
+  type: TYPE_BOX
+  texture: "gui/btn_accel"
+  id: "btn_accel"
+  parent: "root_gui"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: 360.0
+  }
+  type: TYPE_BOX
+  texture: "gui/panel_level"
+  id: "panel_level"
+  parent: "root_gui"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: -20.0
+  }
+  size {
+    x: 200.0
+    y: 50.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_TEXT
+  text: "1 - 1"
+  font: "font_big"
+  id: "text_level"
+  pivot: PIVOT_S
+  parent: "panel_level"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 94.0
+    y: 360.0
+  }
+  type: TYPE_BOX
+  texture: "gui/btn_sound"
+  id: "btn_sound"
+  parent: "root_gui"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -94.0
+    y: 360.0
+  }
+  type: TYPE_BOX
+  texture: "gui/btn_home"
+  id: "btn_home"
+  parent: "root_gui"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: -400.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_TEXT
+  text: "0.0.1"
+  font: "font_default"
+  id: "text_version_main"
+  pivot: PIVOT_S
+  parent: "root_gui"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 235.0
+    y: 418.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "root_levcom"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    y: 180.0
+  }
+  type: TYPE_BOX
+  texture: "gui/btn_play"
+  id: "btn_replay"
+  parent: "root_levcom"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: 284.0
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  type: TYPE_BOX
+  texture: "gui/text_try_again"
+  id: "msg_result"
+  parent: "root_levcom"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  type: TYPE_PARTICLEFX
+  id: "confetti"
+  parent: "root_levcom"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  particlefx: "confetti"
+}
+nodes {
+  position {
+    x: 235.0
+    y: 418.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "root_levcom_sub"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    y: -418.0
+  }
+  type: TYPE_PARTICLEFX
+  id: "corner_confetti"
+  parent: "root_levcom_sub"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  particlefx: "corner_confetti"
+}
+nodes {
+  position {
+    x: 235.0
+    y: 418.0
+  }
+  type: TYPE_BOX
+  texture: "gui/bg"
+  id: "root_title"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  position {
+    y: 50.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  type: TYPE_BOX
+  texture: "gui/logo"
+  id: "logo"
+  parent: "root_title"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: -150.0
+  }
+  type: TYPE_BOX
+  texture: "gui/btn_play"
+  id: "btn_play"
+  parent: "root_title"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: -400.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_TEXT
+  text: "0.0.1"
+  font: "font_default"
+  id: "text_version_title"
+  pivot: PIVOT_S
+  parent: "root_title"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 235.0
+    y: 418.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "root_tutorial"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    x: 190.0
+    y: -379.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "grp_hand"
+  parent: "root_tutorial"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  scale {
+    x: 0.2
+    y: 0.2
+  }
+  type: TYPE_BOX
+  texture: "gui/tutorial_ring"
+  id: "ring"
+  parent: "grp_hand"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 17.0
+    y: -37.0
+  }
+  type: TYPE_BOX
+  texture: "gui/hand_cursor"
+  id: "hand"
+  parent: "grp_hand"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 235.0
+    y: 480.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "root_progress"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    x: -20.0
+  }
+  size {
+    x: 10.0
+    y: 10.0
+  }
+  type: TYPE_BOX
+  id: "grp_bar"
+  parent: "root_progress"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    x: -45.0
+  }
+  type: TYPE_PIE
+  texture: "gui/chest_dot_mask"
+  id: "dot_mask_1"
+  parent: "grp_bar"
+  inherit_alpha: true
+  perimeterVertices: 64
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  clipping_inverted: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 45.0
+  }
+  type: TYPE_PIE
+  texture: "gui/chest_dot_mask"
+  id: "dot_mask_2"
+  parent: "dot_mask_1"
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  clipping_inverted: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 45.0
+  }
+  type: TYPE_PIE
+  texture: "gui/chest_dot_mask"
+  id: "dot_mask_3"
+  parent: "dot_mask_2"
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  clipping_inverted: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -70.5
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  id: "bar_holder"
+  parent: "dot_mask_3"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  type: TYPE_BOX
+  texture: "gui/chest_bar_bg"
+  id: "bar_bg"
+  parent: "bar_holder"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -141.0
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_bar_bg"
+  id: "bar_mask"
+  parent: "bar_holder"
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 141.0
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_bar_fill"
+  id: "bar_fill"
+  parent: "bar_mask"
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -45.0
+  }
+  scale {
+    x: 0.8
+    y: 0.8
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_dot"
+  id: "dot_1"
+  parent: "grp_bar"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  scale {
+    x: 0.8
+    y: 0.8
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_dot"
+  id: "dot_2"
+  parent: "grp_bar"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 45.0
+  }
+  scale {
+    x: 0.8
+    y: 0.8
+    z: 1.0E-6
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_dot"
+  id: "dot_3"
+  parent: "grp_bar"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 89.0
+    y: -31.0
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_closed"
+  id: "btn_chest"
+  pivot: PIVOT_S
+  parent: "root_progress"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 89.0
+    y: -71.0
+  }
+  type: TYPE_BOX
+  texture: "gui/chest_reward_bg"
+  id: "chest_reward"
+  parent: "root_progress"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  type: TYPE_BOX
+  texture: "gui/chest_item1"
+  id: "chest_item"
+  parent: "chest_reward"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
+particlefxs {
+  name: "confetti"
+  particlefx: "/main/particles/confetti.particlefx"
+}
+particlefxs {
+  name: "corner_confetti"
+  particlefx: "/main/particles/corner_confetti.particlefx"
+}

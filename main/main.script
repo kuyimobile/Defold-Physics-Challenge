@@ -1,0 +1,487 @@
+-- game result
+local RESULT_WIN = 1
+local RESULT_LOSS = 2
+-- game status
+local STATUS_IDLE = 1
+local STATUS_ACTIVE = 2
+local STATUS_END = 3
+local STATUS_RESULT = 4
+
+local OFFSET_WALL = 275
+local SCALE_WALL = 0.35
+
+local SCREEN_TITLE = 1
+local SCREEN_GAME = 2
+-- tutorial
+local TUT_NONE = 0
+local TUT_MOVE = 1
+local TUT_ACCEL = 2
+
+local function get_level_result( self )
+	local pose = constants.pose_debug and constants.pose_default or constants.poses[constants.pose_index]
+	local sil_ids = constants.silhouette_ids
+	local bodyparts = constants.BODYPARTS
+	local total_correct = 0
+	local margin_pos = self.is_tutorial_level and 12.5 or 11
+	local margin_rot = self.is_tutorial_level and 10 or 9
+	if ( sil_ids ) then
+		for i = 1, #bodyparts do
+			local part = bodyparts[i]
+			local v = sil_ids[hash("/" .. part)]
+			if ( v ) then
+				if ( pose[part] ) then
+					local pos1 = go.get_position( v )
+					pos1.z = 0
+					local diff_pos = vmath.length( pos1 - vmath.vector3( pose[part].pos[1], pose[part].pos[2], 0 ) )
+					local rot1 = go.get( v, "euler.z" )
+					local diff_rot = ( rot1 - pose[part].rot )
+					local diff_rot_orig = diff_rot
+
+					-- trim excess full rotations
+					local val_ab = math.abs( diff_rot )
+					if ( val_ab > 180 ) then
+						diff_rot = diff_rot - utils.round( val_ab / 360, 0 ) * 360 * ( diff_rot / val_ab )
+					end
+					
+					if ( diff_pos <= margin_pos and diff_rot <= margin_rot and diff_rot >= -margin_rot ) then
+						total_correct = total_correct + 1
+					end
+					--[[
+					print("pos " .. diff_pos)
+					if ( val_ab > 300 ) then
+						print("ROT EXTRA: " .. diff_rot_orig)
+					end
+					print("rot " .. diff_rot)
+					--]]
+				end
+			end
+		end
+	end
+	return total_correct == #bodyparts
+end
+
+local function set_tutorial_val( self, val_fixed, val_add )
+	if ( val_fixed ) then
+		self.tutorial_val = val_fixed
+	else
+		self.tutorial_val = self.tutorial_val + val_add
+	end
+end
+
+local function set_tutorial_mode( self, mode, val_progress )
+	self.tutorial_mode = mode
+
+	if ( mode == TUT_NONE ) then
+		self.tutorial_val = 0
+		msg.post( "hand", "disable" )
+		msg.post( "marker", "disable" )
+		msg.post( "ring", "disable" )
+	elseif ( mode == TUT_MOVE ) then
+		if ( val_progress == 0 ) then
+			self.is_tutorial_level = true
+		else
+			set_tutorial_val( self, nil, 1 )
+			if ( self.tutorial_val == 1 ) then
+				msg.post( "hand", "enable" )
+				msg.post( "marker", "enable" )
+				msg.post( "ring", "enable" )
+				go.set( "marker#sprite", "tint", vmath.vector4( 1, 0, 0, 1 ) )
+				go.set_scale( 0.1, "marker" )
+				go.animate( "marker", "scale", go.PLAYBACK_ONCE_FORWARD, 1.1, go.EASING_OUTBACK, 0.2 )
+				if ( constants.dummy_ids[hash("/leftfoot")] ) then
+					local pos_orig = go.get_position( "hand" )
+					local pos_start = go.get_world_position( constants.dummy_ids[hash("/leftfoot")] )
+					--print(pos_target)
+					local pos_end = vmath.vector3( pos_start.x - 80, pos_start.y + 70, 0 )
+					pos_start.z = pos_orig.z
+					pos_end.z = pos_end.z
+					--pos_target = vmath.vector3( 80, 178, 0 )
+					go.set_position( vmath.vector3( pos_end.x, pos_end.y, 0 ), "marker" )
+					--go.set_position( vmath.vector3( pos_start.x, pos_start.y, 0 ), "ring" )
+					local function animate_hand()
+						local duration_hand = 1
+						go.cancel_animations( "ring#sprite", "tint.w" )
+						go.cancel_animations( "ring", "scale" )
+						go.set( "ring#sprite", "tint.w", 1 )
+						go.set_scale( vmath.vector3( 0.2, 0.2, 0.2 ), "ring" )
+						
+						go.set_position( pos_start, "hand" )
+						go.animate( "hand", "position", go.PLAYBACK_ONCE_FORWARD, pos_end, go.EASING_OUTEXPO, duration_hand, 1, function() 
+							animate_hand()
+						end )
+						go.animate( "ring#sprite", "tint.w", go.PLAYBACK_ONCE_FORWARD, 0.5, go.EASING_LINEAR, duration_hand, 0 )
+						go.animate( "ring", "scale", go.PLAYBACK_ONCE_FORWARD, 0.5, go.EASING_LINEAR, duration_hand, 0 )
+					end
+					animate_hand()
+				end
+			end
+		end
+	elseif ( mode == TUT_ACCEL ) then
+		go.cancel_animations( "hand", "position" )
+		msg.post( "hand", "disable" )
+		msg.post( "marker", "disable" )
+		msg.post( "ring", "disable" )
+		msg.post( "gui#gui_main", "show_tutorial", { tutorial_mode = self.tutorial_mode } )
+	end
+	if ( val_progress == 0 ) then
+		msg.post( "gui#gui_main", "set_tutorial_mode", { tutorial_mode = self.tutorial_mode } )
+	end
+end
+
+local function animate_wall( self, is_fastforward )
+	local scale = go.get( "wall", "scale.x" )
+	local duration = is_fastforward and ( 1 - scale ) / 0.65 or constants.cur_level_main <= 1 and 22 or constants.cur_level_main <= 3 and 20 or 18
+	local easing = is_fastforward and go.EASING_LINEAR or go.EASING_INCIRC
+	if ( self.timer_wall ) then
+		timer.cancel( self.timer_wall )
+		self.timer_wall = nil
+	end
+	self.timer_wall = timer.delay( is_fastforward and 0 or 1, false, function()
+		go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, self.pos_dummy.y - OFFSET_WALL, easing, duration )
+		go.animate( "wall", "scale", go.PLAYBACK_ONCE_FORWARD, 1.0, easing, duration, 0, function()
+			msg.post( ".", "check_dummy" )
+		end )
+	end )
+	if ( not self.timer_alpha and constants.dummy_script ) then
+		self.timer_alpha = timer.delay( 10, false, function() 
+			msg.post( constants.dummy_script, "set_alpha" )
+		end )
+	end
+	--]]
+end
+
+local function create_dummy( self )
+	-- Spawn dummy main
+	self.pos_dummy = vmath.vector3( 235, 290, 0.04 )
+	local props = {}
+	props[hash("/body")] = { type = 1, scale = 1 } -- 1 = orig, 2 = instance
+	constants.dummy_ids = collectionfactory.create( "factories#factory_dummy_main", self.pos_dummy, nil, props, constants.sil_scale )
+
+	if ( constants.dummy_ids[hash("/body")] ) then
+		constants.dummy_script = msg.url( nil, constants.dummy_ids[hash("/body")], "obj_dummy" )
+
+		if ( self.dummy_alpha and self.dummy_alpha ~= 1 ) then
+			msg.post( constants.dummy_script, "set_alpha", { val = self.dummy_alpha } )
+		end
+	end
+end
+
+local function add_poses( self )
+	local poses_new = {}
+	local index = ( constants.cur_level_main > 0 and constants.cur_level_main <= #constants.POSE_POOL ) and constants.cur_level_main or nil
+	if ( self.tutorial_mode == TUT_MOVE ) then
+		poses_new[1] = constants.POSE_TUTORIAL
+	elseif ( index ) then
+		local tbl_copy = utils.copy_table( constants.POSE_POOL[index] )
+		if ( constants.cur_level_main ~= 1 or true ) then
+			-- shuffle list of 3 poses
+			poses_new = utils.shuffle( tbl_copy )
+		else
+			-- keep first pose and shuffle the rest
+			poses_new[1] = tbl_copy[1]
+			table.remove( tbl_copy, 1 )
+			utils.shuffle( tbl_copy )
+			for i = 1, #tbl_copy do
+				poses_new[#poses_new + 1] = tbl_copy[i]
+			end
+		end
+	else
+		for i = 1, #constants.POSE_POOL do
+			local list_temp = constants.POSE_POOL[i]
+			for j = 1, #list_temp do
+				poses_new[#poses_new + 1] = list_temp[j]
+			end
+		end
+		poses_new = utils.shuffle( poses_new )
+	end
+	constants.poses = {}
+	for i = 1, 3 do
+		if ( poses_new[i] ) then
+			constants.poses[i] = poses_new[i]
+		end
+	end
+end 
+
+local function create_level( self )
+	self.game_status = STATUS_IDLE
+	local pos_wall = vmath.vector3( self.S_WIDTH * 0.5, ( self.S_HEIGHT * 0.5 ) + 200 - OFFSET_WALL * SCALE_WALL, 1 )
+	msg.post( "cursor#cursor_controller", "toggle_input", { val = false } )
+	create_dummy( self )
+	
+	-- Spawn dummy silhouette
+	local pos = vmath.vector3( self.S_WIDTH * 0.5, ( self.S_HEIGHT * 0.5 ) + 178, 0.04 )
+	pos = nil
+	local props = {}
+	props[hash("/body")] = { type = 2, scale = constants.sil_scale } -- 1 = orig, 2 = instance
+	constants.silhouette_ids = collectionfactory.create( "factories#factory_dummy_sil", vmath.vector3( 0, OFFSET_WALL, 0 ), nil, props, constants.sil_scale )
+	--]]
+
+	-- Position wall
+	local pos_wall_orig = go.get_position( "wall" )
+	pos_wall.z = pos_wall_orig.z
+	local new_pos = vmath.vector3( self.S_WIDTH * 0.5, self.S_HEIGHT + 500, pos_wall_orig.z )
+	go.set( "wall", "position", new_pos )
+	sprite.play_flipbook( "wall#sprite_texture", "wall" )
+
+	--
+	-- Spawn dummy mask
+	local props = {}
+	props[hash("/body")] = { type = 3, scale = constants.sil_scale } -- 1 = orig, 2 = instance
+	constants.mask_ids = collectionfactory.create( "factories#factory_dummy_mask", vmath.vector3( 0, OFFSET_WALL, 0 ), nil, props, constants.sil_scale )
+	if ( constants.mask_ids[hash("/body")] ) then
+		constants.mask_script = msg.url( nil, constants.mask_ids[hash("/body")], "obj_dummy" )
+	end
+	--]]
+
+	-- determine hole
+	local pose_total = #constants.poses
+	constants.pose_index = 1--math.random( 1, #constants.poses )
+	if ( constants.cur_level_sub >= 4 ) then
+		constants.cur_level_sub = 1
+	end
+	constants.pose_index = constants.cur_level_sub <= pose_total and constants.cur_level_sub or pose_total >= 1 and pose_total or nil
+	if ( constants.mask_script ) then
+		msg.post( constants.mask_script, "load_pose" )
+	end
+
+	go.set_parent( constants.mask_ids[hash("/silhouette")], "wall" )
+	go.set_parent( constants.silhouette_ids[hash("/silhouette")], "wall" )
+	go.set( "wall", "scale", vmath.vector3( SCALE_WALL, SCALE_WALL, 1.0 ) )
+
+	msg.post( "gui#gui_main", "update_level" )
+	msg.post( "gui#gui_main", "set_tutorial_mode", { tutorial_mode = self.tutorial_mode } )
+	--
+	go.animate( "wall", "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3( SCALE_WALL * 1.1, SCALE_WALL * 0.8, 1 ), go.EASING_INQUAD, 0.1, 0.9, function() end )
+	go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, ( self.S_HEIGHT * 0.5 ) + 195 - OFFSET_WALL * SCALE_WALL, go.EASING_INQUAD, 1, 0.5, function() 
+		msg.post( "camera#screen_shake", "shake", { shake = 10 } )
+		sound.play( "/sounds#thud", { delay = 0, gain = constants.SFX_GAIN } )
+		msg.post( "cursor#cursor_controller", "toggle_input", { val = true } )
+		if ( self.tutorial_mode == TUT_MOVE and constants.dummy_script ) then
+			msg.post( constants.dummy_script, "disable_dummy", { is_tutorial = true } )
+			set_tutorial_mode( self, TUT_MOVE, 1 )
+		end
+		go.animate( "wall", "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3( SCALE_WALL, SCALE_WALL, 1 ), go.EASING_INQUAD, 0.1, 0, function() end )
+		go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, ( self.S_HEIGHT * 0.5 ) + 200 - OFFSET_WALL * SCALE_WALL, go.EASING_LINEAR, 0.1, 0, function() 
+			self.game_status = STATUS_ACTIVE
+			if ( self.tutorial_mode ~= TUT_MOVE ) then
+				animate_wall( self, false )
+			end
+		end )
+	end )
+	--]]
+	timer.delay( 1, false, function() 
+		if ( constants.dummy_script ) then
+			msg.post( constants.dummy_script, "start_silhouette" )
+		end
+	end )
+end
+
+local function clear_dummy( self )
+	if ( constants.dummy_script ) then
+		msg.post( constants.dummy_script, "cancel_alpha" )
+	end
+
+	if ( constants.dummy_ids ) then
+		if ( constants.dummy_ids[hash("/body")] ) then
+			local sprite_body = msg.url( nil, constants.dummy_ids[hash("/body")], "sprite" )
+			self.dummy_alpha = go.get( sprite_body , "tint.w" )
+		end
+		
+		for k, v in pairs( constants.dummy_ids ) do
+			go.delete(v)
+			constants.dummy_ids[k] = nil
+		end
+	end
+end
+
+local function clear_level( self )
+	msg.post( "gui#gui_main", "clear_level" )
+	if ( self.timer_wall ) then
+		timer.cancel( self.timer_wall )
+		self.timer_wall = nil
+	end
+	if ( self.timer_alpha ) then
+		timer.cancel( self.timer_alpha )
+		self.timer_alpha = nil
+	end
+	go.cancel_animations( "wall", "position.y" )
+	go.cancel_animations( "wall", "scale" )
+	clear_dummy( self )
+	self.dummy_alpha = nil
+	constants.dummy_script = nil
+	constants.mask_script = nil
+
+	if ( constants.silhouette_ids ) then
+		for k, v in pairs( constants.silhouette_ids ) do
+			go.delete(v)
+			constants.silhouette_ids[k] = nil
+		end
+	end
+
+	if ( constants.mask_ids ) then
+		for k, v in pairs( constants.mask_ids ) do
+			go.delete(v)
+			constants.mask_ids[k] = nil
+		end
+	end
+end
+
+local function reset_level( self )
+	clear_level( self )
+	create_level( self )
+end
+
+local function screen_to_world( self, x, y, z, camera )
+	local projection = go.get(camera, "projection")
+	local view = go.get(camera, "view")
+	local w, h = window.get_size()
+	-- The window.get_size() function will return the scaled window size,
+	-- ie taking into account display scaling (Retina screens on macOS for
+	-- instance). We need to adjust for display scaling in our calculation.
+	w = w / (w / self.S_WIDTH)
+	h = h / (h / self.S_HEIGHT)
+
+	-- https://defold.com/manuals/camera/#converting-mouse-to-world-coordinates
+	local inv = vmath.inv(projection * view)
+	x = (2 * x / w) - 1
+	y = (2 * y / h) - 1
+	z = (2 * z) - 1
+	local x1 = x * inv.m00 + y * inv.m01 + z * inv.m02 + inv.m03
+	local y1 = x * inv.m10 + y * inv.m11 + z * inv.m12 + inv.m13
+	local z1 = x * inv.m20 + y * inv.m21 + z * inv.m22 + inv.m23
+	return x1, y1, z1
+end
+
+local function set_zoom( self )
+	local window_width, window_height = window.get_size()
+	local zoom = math.min( window_width / self.S_WIDTH, window_height / self.S_HEIGHT )
+	msg.post( "gui#gui_main", "update_zoom", { zoom = zoom } )
+	go.set( "/camera#camera", "orthographic_zoom", zoom )
+end
+
+local function window_callback(self, event, data)
+	if event == window.WINDOW_EVENT_RESIZED then
+		set_zoom( self )
+	end
+end
+
+function init(self)
+	msg.post( "@render:", "use_camera_projection" )
+	msg.post( ".", "acquire_input_focus" )
+	msg.post( ".", "delay_init" )
+end
+
+function on_message(self, message_id, message, sender)
+	if ( message_id == hash( "delay_init" ) ) then
+		-- Seed randomizer
+		math.randomseed( os.time() )
+
+		-- Get screen width and height
+		self.S_WIDTH = tonumber(sys.get_config_int( "display.width" ))
+		self.S_HEIGHT = tonumber(sys.get_config_int( "display.height" ))
+		window.set_listener( window_callback )
+		set_zoom( self )
+
+		if ( constants.silhouette_ids ) then
+			for k, v in pairs( constants.silhouette_ids ) do
+				constants.silhouette_ids[k] = nil
+			end
+		end
+
+		if ( constants.mask_ids ) then
+			for k, v in pairs( constants.mask_ids ) do
+				constants.mask_ids[k] = nil
+			end
+		end
+		
+		self.tutorials = {}
+		set_tutorial_mode( self, TUT_NONE, 0 )
+		set_tutorial_mode( self, TUT_MOVE, 0 )
+		add_poses( self )
+	elseif ( message_id == hash( "release_bodypart" ) ) then
+		if ( self.tutorial_mode == TUT_MOVE and get_level_result( self ) ) then
+			set_tutorial_mode( self, TUT_ACCEL, 0 )
+			msg.post( constants.dummy_script, "disable_dummy" )
+			if ( not self.tutorials[TUT_MOVE] ) then
+				self.tutorials[TUT_MOVE] = 1
+			end
+			msg.post( "gui#gui_main", "show_hint_accel" )
+		else
+			if ( get_level_result( self ) ) then
+				msg.post( "gui#gui_main", "show_hint_accel" )
+			else
+				msg.post( "gui#gui_main", "hide_hint_accel" )
+			end
+		end
+	elseif ( message_id == hash( "check_dummy" ) ) then
+		self.game_status = STATUS_END
+		local did_win = get_level_result( self )
+		utils.stop_poki()
+
+		local is_level_main = false
+		local is_tutorial_level = self.is_tutorial_level
+		local result = did_win and RESULT_WIN or RESULT_LOSS
+		if ( result == RESULT_WIN ) then
+			if ( self.tutorial_mode == TUT_ACCEL ) then
+				set_tutorial_mode( self, TUT_NONE, 0 )
+				self.is_tutorial_level = nil
+				if ( not self.tutorials[TUT_ACCEL] ) then
+					self.tutorials[TUT_ACCEL] = 1
+				end
+				add_poses( self )
+			else
+				constants.cur_level_sub = constants.cur_level_sub + 1
+			end
+			if ( constants.cur_level_sub >= 4 ) then
+				sound.play( "/sounds#win_main", { delay = 0, gain = constants.SFX_GAIN } )
+				constants.cur_level_main = constants.cur_level_main + 1
+				is_level_main = true
+				add_poses( self )
+			else
+				sound.play( "/sounds#win", { delay = 0, gain = constants.SFX_GAIN } )
+				timer.delay( is_tutorial_level and 1.5 or 2, false, function() 
+					utils.start_poki()
+					reset_level( self )
+				end )
+			end
+			sprite.play_flipbook( "wall#sprite_texture", "wall_win" )
+		else
+			sound.play( "/sounds#lose", { delay = 0, gain = constants.SFX_GAIN } )
+			sprite.play_flipbook( "wall#sprite_texture", "wall_lose" )
+		end
+		msg.post( "gui#gui_main", "on_level_complete", { result = result, is_level_main = is_level_main, is_tutorial_level = is_tutorial_level } )
+		if ( self.timer_alpha ) then
+			timer.cancel( self.timer_alpha )
+			self.timer_alpha = nil
+		end
+		if ( constants.dummy_script ) then
+			msg.post( constants.dummy_script, "disable_dummy" )
+			msg.post( constants.dummy_script, "cancel_alpha" )
+		end
+	elseif ( message_id == hash( "reset_level" ) ) then
+		utils.start_poki()
+		reset_level( self )
+	elseif ( message_id == hash( "reset_dummy" ) and self.game_status == STATUS_ACTIVE ) then
+		clear_dummy( self )
+		create_dummy( self )
+	elseif ( message_id == hash( "accel_wall" ) and self.game_status == STATUS_ACTIVE ) then
+		animate_wall( self, true )
+	elseif ( message_id == hash( "pause_game" ) ) then
+		utils.stop_poki()
+		clear_level( self )
+	elseif ( message_id == hash( "resume_game" ) ) then
+		--sound.play( "/sounds#mus_main", { delay = 0, gain = constants.MUS_GAIN } )
+		utils.start_poki()
+		create_level( self )
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash( "key_enter" ) then
+		if action.released then
+			if ( constants.dummy_script ) then
+				msg.post( constants.dummy_script, "capture_pose" )
+			end
+		end
+	end
+end

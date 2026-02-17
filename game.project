@@ -1,24 +1,36 @@
 [bootstrap]
-main_collection = /main/main.collectionc
+main_collection = /main/loader.collectionc
+render = /main/render/postprocess.renderc
 
 [script]
 shared_state = 1
 
 [display]
-width = 960
-height = 640
+width = 470
+height = 836
 high_dpi = 1
 
 [android]
 input_method = HiddenInputField
 
-[physics]
-gravity_y = -1000.0
-scale = 0.01
-
 [html5]
 scale_mode = stretch
+wasm_streaming = 1
+show_fullscreen_button = 0
+show_made_with_defold = 0
+splash_image = /assets/splash_html5.png
 
 [project]
-title = Holey Moley
+title = Holey Moly
+version = 0.0.1
+publisher = Kuyi Mobile
+developer = Kuyi Mobile
+dependencies#0 = https://github.com/britzl/defold-orthographic/archive/2.6.0.zip
+dependencies#1 = https://github.com/britzl/gooey/archive/refs/tags/10.4.1.zip
+dependencies#2 = https://github.com/defold/extension-poki-sdk/archive/refs/tags/2.0.1.zip
+
+[physics]
+debug = 0
+scale = 0.1
+gravity_y = 0.0
 

@@ -1,2 +1,340 @@
 name: "main"
 scale_along_z: 0
+embedded_instances {
+  id: "controller"
+  data: "components {\n"
+  "  id: \"main\"\n"
+  "  component: \"/main/main.script\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "background"
+  data: "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"bg\\\"\\n"
+  "material: \\\"/main/materials/bg/bg.material\\\"\\n"
+  "size {\\n"
+  "  x: 1280.0\\n"
+  "  y: 960.0\\n"
+  "}\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"stage\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"stage\\\"\\n"
+  "material: \\\"/main/materials/bg/bg.material\\\"\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    z: 0.01\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 235.0
+    y: 480.0
+  }
+}
+embedded_instances {
+  id: "camera"
+  data: "components {\n"
+  "  id: \"screen_shake\"\n"
+  "  component: \"/main/screen_shake.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"camera\"\n"
+  "  type: \"camera\"\n"
+  "  data: \"aspect_ratio: 1.0\\n"
+  "fov: 0.7854\\n"
+  "near_z: -1.0\\n"
+  "far_z: 1.0\\n"
+  "orthographic_projection: 1\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    x: 235.0
+    y: 418.0
+  }
+}
+embedded_instances {
+  id: "cursor"
+  data: "components {\n"
+  "  id: \"cursor\"\n"
+  "  component: \"/main/cursor.script\"\n"
+  "}\n"
+  "components {\n"
+  "  id: \"cursor_controller\"\n"
+  "  component: \"/main/cursor_controller.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"collisionobject\"\n"
+  "  type: \"collisionobject\"\n"
+  "  data: \"type: COLLISION_OBJECT_TYPE_TRIGGER\\n"
+  "mass: 0.0\\n"
+  "friction: 0.1\\n"
+  "restitution: 0.5\\n"
+  "group: \\\"default\\\"\\n"
+  "mask: \\\"default\\\"\\n"
+  "embedded_collision_shape {\\n"
+  "  shapes {\\n"
+  "    shape_type: TYPE_SPHERE\\n"
+  "    position {\\n"
+  "    }\\n"
+  "    rotation {\\n"
+  "    }\\n"
+  "    index: 0\\n"
+  "    count: 1\\n"
+  "  }\\n"
+  "  data: 10.269614\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"cursor\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    x: 265.0
+    y: 246.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "factories"
+  data: "embedded_components {\n"
+  "  id: \"factory_dummy_sil\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/main/obj_dummy_silhouette_static.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"factory_dummy_main\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/main/obj_dummy.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"factory_dummy_mask\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/main/obj_dummy_mask.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "wall"
+  data: "embedded_components {\n"
+  "  id: \"sprite_mask\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"wall_white\\\"\\n"
+  "material: \\\"/main/materials/mask/mask.material\\\"\\n"
+  "size {\\n"
+  "  x: 878.0\\n"
+  "  y: 550.0\\n"
+  "}\\n"
+  "textures {\\n"
+  "  sampler: \\\"DIFFUSE_TEXTURE\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    y: 275.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"sprite_texture\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"wall\\\"\\n"
+  "material: \\\"/main/materials/texture/texture.material\\\"\\n"
+  "size {\\n"
+  "  x: 878.0\\n"
+  "  y: 550.0\\n"
+  "}\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    y: 275.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 235.0
+    y: 350.0
+    z: -0.01
+  }
+}
+embedded_instances {
+  id: "dummy_main"
+  data: ""
+  position {
+    x: 235.0
+    y: 290.0
+    z: 0.5
+  }
+}
+embedded_instances {
+  id: "quad"
+  data: "embedded_components {\n"
+  "  id: \"model\"\n"
+  "  type: \"model\"\n"
+  "  data: \"mesh: \\\"/assets/model/quad.dae\\\"\\n"
+  "name: \\\"unnamed\\\"\\n"
+  "materials {\\n"
+  "  name: \\\"default\\\"\\n"
+  "  material: \\\"/main/materials/quad/quad.material\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "gui"
+  data: "components {\n"
+  "  id: \"gui_main\"\n"
+  "  component: \"/main/gui_main.gui\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "sounds"
+  data: "embedded_components {\n"
+  "  id: \"click\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sfx_click.wav\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"win\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sfx_win.wav\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"lose\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sfx_wrong.wav\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"win_main\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sfx_congrats.wav\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"thud\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sfx_thud.wav\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"release\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sfx_release.wav\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "tutorial"
+  children: "hand"
+  children: "marker"
+  data: ""
+  position {
+    z: 0.2
+  }
+}
+embedded_instances {
+  id: "hand"
+  children: "ring"
+  data: "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"hand_cursor\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 20.0\n"
+  "    y: -38.0\n"
+  "    z: 0.001\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 150.0
+    y: 160.0
+    z: 0.001
+  }
+}
+embedded_instances {
+  id: "marker"
+  data: "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"dummy_touch_point\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    x: 150.0
+    y: 160.0
+  }
+  scale3 {
+    x: 1.1
+    y: 1.1
+  }
+}
+embedded_instances {
+  id: "ring"
+  data: "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"tutorial_ring\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "size {\\n"
+  "  x: 146.0\\n"
+  "  y: 146.0\\n"
+  "}\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/atlas/gui.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  ""
+  scale3 {
+    x: 1.1
+    y: 1.1
+  }
+}

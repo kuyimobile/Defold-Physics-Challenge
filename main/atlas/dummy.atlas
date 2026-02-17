@@ -1,0 +1,79 @@
+images {
+  image: "/assets/dummy_body.png"
+}
+images {
+  image: "/assets/dummy_head.png"
+}
+images {
+  image: "/assets/dummy_limb.png"
+}
+images {
+  image: "/assets/dummy_body2.png"
+}
+images {
+  image: "/assets/dummy_head2.png"
+}
+images {
+  image: "/assets/dummy_body_sil.png"
+}
+images {
+  image: "/assets/dummy_head_sil.png"
+}
+images {
+  image: "/assets/dummy_limb_sil.png"
+}
+images {
+  image: "/assets/dummy_left_arm_top.png"
+}
+images {
+  image: "/assets/dummy_left_arm_top2.png"
+}
+images {
+  image: "/assets/dummy_left_leg_top.png"
+}
+images {
+  image: "/assets/dummy_left_leg_top2.png"
+}
+images {
+  image: "/assets/dummy_right_arm_top.png"
+}
+images {
+  image: "/assets/dummy_right_arm_top2.png"
+}
+images {
+  image: "/assets/dummy_right_leg_top.png"
+}
+images {
+  image: "/assets/dummy_right_leg_top2.png"
+}
+images {
+  image: "/assets/dummy_touch_point.png"
+}
+images {
+  image: "/assets/dummy_left_arm_bottom.png"
+}
+images {
+  image: "/assets/dummy_left_leg_bottom.png"
+}
+images {
+  image: "/assets/dummy_left_leg_bottom2.png"
+}
+images {
+  image: "/assets/dummy_right_arm_bottom.png"
+}
+images {
+  image: "/assets/dummy_right_arm_bottom2.png"
+}
+images {
+  image: "/assets/dummy_right_leg_bottom.png"
+}
+images {
+  image: "/assets/dummy_right_leg_bottom2.png"
+}
+images {
+  image: "/assets/dummy_head3.png"
+}
+images {
+  image: "/assets/dummy_head4.png"
+}
+extrude_borders: 2

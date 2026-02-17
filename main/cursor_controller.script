@@ -1,0 +1,65 @@
+local cursor = require "main.include.cursor"
+
+function init(self)
+	if not go.get("#cursor", "acquire_input_focus") then
+		self.forward_input = true
+		msg.post(".", "acquire_input_focus")
+	end
+
+	cursor.listen(msg.url("#cursor"), cursor.DRAG_START, function(message_id, message)
+		print("Drag start")
+		-- prevent dragging of blue aliens
+		if message.group == hash("blue") then
+			print("Prevent drag on blue")
+			return true
+		end
+	end)
+
+	msg.post( "#sprite", "disable" )
+end
+
+function on_input(self, action_id, action)
+	if self.forward_input then
+		if ( action.pressed ) then
+			--pprint(action)
+		end
+		msg.post("#cursor", "input", { action_id = action_id, action = action })
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	local script_url = constants.dummy_script
+	if message_id == cursor.OVER then
+		--print("Cursor over", message.id, message.group, message.x, message.y)
+	elseif message_id == cursor.OUT then
+		--print("Cursor out", message.id, message.group, message.x, message.y)
+	elseif message_id == cursor.PRESSED then
+		--print("Pressed", message.id, message.group, message.x, message.y)
+		--print("id " .. message.id)
+		--pprint(message)
+		if ( script_url and message.id ) then
+			msg.post( script_url, "choose_bodypart", { part_id = message.id } )
+		end
+	elseif message_id == cursor.RELEASED then
+		--print("Released", message.id, message.group, message.x, message.y)
+		if ( message.id ) then
+			msg.post( "controller#main", "release_bodypart", { part_id = message.id } )
+			if ( script_url ) then
+				msg.post( script_url, "release_bodypart", { part_id = message.id } )
+			end
+		end
+	elseif message_id == cursor.CLICKED then
+		--print("Clicked", message.id, message.group, message.x, message.y)
+	elseif message_id == cursor.DRAG_START then
+		--print("Drag started", message.id, message.group, message.x, message.y)
+	elseif message_id == cursor.DRAG_END then
+		--print("Drag ended", message.id, message.group, message.x, message.y)
+	elseif message_id == cursor.DRAG then
+		--print("Drag", message.id, message.group, message.x, message.y, message.dx, message.dy)
+		if ( script_url and message.id ) then
+			msg.post( script_url, "move_silhouette", { is_touch_event = true, x = message.x, y = message.y } )
+		end
+	elseif ( message_id == hash( "toggle_input" ) ) then
+		self.forward_input = message.val
+	end
+end

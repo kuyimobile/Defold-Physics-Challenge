@@ -1,0 +1,145 @@
+images {
+  image: "/assets/dummy_touch_point.png"
+}
+images {
+  image: "/assets/bg.png"
+}
+images {
+  image: "/assets/cursor.png"
+}
+images {
+  image: "/assets/dummy_body_sil.png"
+}
+images {
+  image: "/assets/dummy_head_sil.png"
+}
+images {
+  image: "/assets/dummy_limb_sil.png"
+}
+images {
+  image: "/assets/stage.png"
+}
+images {
+  image: "/assets/wall.png"
+}
+images {
+  image: "/assets/wall_white.png"
+}
+images {
+  image: "/assets/btn_reset.png"
+}
+images {
+  image: "/assets/btn_play.png"
+}
+images {
+  image: "/assets/btn_accel.png"
+}
+images {
+  image: "/assets/btn_home.png"
+}
+images {
+  image: "/assets/btn_sound.png"
+}
+images {
+  image: "/assets/btn_sound_off.png"
+}
+images {
+  image: "/assets/panel_level.png"
+}
+images {
+  image: "/assets/confetti.png"
+}
+images {
+  image: "/assets/hand_cursor.png"
+}
+images {
+  image: "/assets/tutorial_ring.png"
+}
+images {
+  image: "/assets/btn_retry.png"
+}
+images {
+  image: "/assets/wall_win.png"
+}
+images {
+  image: "/assets/wall_lose.png"
+}
+images {
+  image: "/assets/chest_dot.png"
+}
+images {
+  image: "/assets/chest_open.png"
+}
+images {
+  image: "/assets/chest_closed.png"
+}
+images {
+  image: "/assets/chest_item1.png"
+}
+images {
+  image: "/assets/chest_item2.png"
+}
+images {
+  image: "/assets/chest_item3.png"
+}
+images {
+  image: "/assets/chest_item4.png"
+}
+images {
+  image: "/assets/chest_item5.png"
+}
+images {
+  image: "/assets/chest_item6.png"
+}
+images {
+  image: "/assets/chest_dot_star.png"
+}
+images {
+  image: "/assets/chest_reward_bg.png"
+}
+images {
+  image: "/assets/chest_bar_mask.png"
+}
+images {
+  image: "/assets/chest_bar_bg.png"
+}
+images {
+  image: "/assets/chest_bar_fill.png"
+}
+images {
+  image: "/assets/chest_dot_mask.png"
+}
+animations {
+  id: "logo"
+  images {
+    image: "/assets/logo1.png"
+  }
+  images {
+    image: "/assets/logo2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "text_great"
+  images {
+    image: "/assets/text_great1.png"
+  }
+  images {
+    image: "/assets/text_great2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "text_try_again"
+  images {
+    image: "/assets/text_try_again1.png"
+  }
+  images {
+    image: "/assets/text_try_again2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+extrude_borders: 2
