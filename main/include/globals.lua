@@ -1,14 +1,16 @@
 --[[
 Submitted to Defold Challenge #5: Break It!
 
-I started this project to study and experiment with Defold's joints and physics.
+An experiment on Defold's joints and physics.
+
+Uses gooey by britzl: https://github.com/britzl/gooey
 
 ]]--
 
 
 local M = {}
 -- Constants
-M.VERSION = "0.0.6"
+M.VERSION = "0.0.1"
 M.SFX_GAIN = 1.0
 M.MUS_GAIN = 0.75
 M.BODYPARTS = { "body", "leftlowerarm", "leftlowerleg", "leftupperarm", "leftupperleg",

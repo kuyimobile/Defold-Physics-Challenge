@@ -22,7 +22,7 @@ splash_image = /assets/splash_html5.png
 
 [project]
 title = Holey Moly
-version = 0.0.6
+version = 0.0.1
 publisher = Kuyi Mobile
 developer = Kuyi Mobile
 dependencies#0 = https://github.com/britzl/defold-orthographic/archive/2.6.0.zip
