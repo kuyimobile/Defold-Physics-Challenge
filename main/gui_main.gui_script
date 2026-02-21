@@ -35,23 +35,6 @@ function on_message(self, message_id, message, sender)
 	elseif ( message_id == hash( "set_debug" ) ) then
 		--gui.set_text( gui.get_node( "text_version_main" ), message.str )
 		--gui.set_text( gui.get_node( "text_version_main" ), constants.debug_text )
-	elseif ( message_id == hash( "update_zoom" ) ) then
-		local node_version_main = gui.get_node( "text_version_main" )
-		local node_version_title = gui.get_node( "text_version_title" )
-		local pos_version = gui.get_position( node_version_main )
-		local window_width, window_height = window.get_size()
-		pos_version.x, pos_version.y = 0, 6 - 418
-		if ( window_width / self.S_WIDTH < window_height / self.S_HEIGHT ) then
-			pos_version.y = pos_version.y - ( window_height / message.zoom - self.S_HEIGHT ) * 0.5
-		else
-			--pos_version.x = pos_version.x + ( window_width  / message.zoom - self.S_WIDTH ) * 0.5
-		end
-		if ( pos_version.y < -532 ) then
-			pos_version.y = -532
-		end
-		gui.set_position( node_version_main, pos_version )
-		gui.set_position( node_version_title, pos_version )
-		gui.set_position( gui.get_node( "corner_confetti" ), pos_version )
 	elseif ( message_id == hash( "update_level" ) ) then
 		gui.set_enabled( gui.get_node( "btn_reset" ), true )
 		gui.set_enabled( gui.get_node( "btn_accel" ), true )

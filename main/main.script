@@ -204,12 +204,12 @@ end
 
 local function create_level( self )
 	self.game_status = STATUS_IDLE
-	local pos_wall = vmath.vector3( self.S_WIDTH * 0.5, ( self.S_HEIGHT * 0.5 ) + 200 - OFFSET_WALL * SCALE_WALL, 1 )
+	local pos_wall = vmath.vector3( constants.S_WIDTH * 0.5, ( constants.S_HEIGHT * 0.5 ) + 200 - OFFSET_WALL * SCALE_WALL, 1 )
 	msg.post( "cursor#cursor_controller", "toggle_input", { val = false } )
 	create_dummy( self )
 	
 	-- Spawn dummy silhouette
-	local pos = vmath.vector3( self.S_WIDTH * 0.5, ( self.S_HEIGHT * 0.5 ) + 178, 0.04 )
+	local pos = vmath.vector3( constants.S_WIDTH * 0.5, ( constants.S_HEIGHT * 0.5 ) + 178, 0.04 )
 	pos = nil
 	local props = {}
 	props[hash("/body")] = { type = 2, scale = constants.sil_scale } -- 1 = orig, 2 = instance
@@ -219,7 +219,7 @@ local function create_level( self )
 	-- Position wall
 	local pos_wall_orig = go.get_position( "wall" )
 	pos_wall.z = pos_wall_orig.z
-	local new_pos = vmath.vector3( self.S_WIDTH * 0.5, self.S_HEIGHT + 500, pos_wall_orig.z )
+	local new_pos = vmath.vector3( constants.S_WIDTH * 0.5, constants.S_HEIGHT + 500, pos_wall_orig.z )
 	go.set( "wall", "position", new_pos )
 	sprite.play_flipbook( "wall#sprite_texture", "wall" )
 
@@ -252,7 +252,7 @@ local function create_level( self )
 	msg.post( "gui#gui_main", "set_tutorial_mode", { tutorial_mode = self.tutorial_mode } )
 	--
 	go.animate( "wall", "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3( SCALE_WALL * 1.1, SCALE_WALL * 0.8, 1 ), go.EASING_INQUAD, 0.1, 0.9, function() end )
-	go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, ( self.S_HEIGHT * 0.5 ) + 195 - OFFSET_WALL * SCALE_WALL, go.EASING_INQUAD, 1, 0.5, function() 
+	go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, ( constants.S_HEIGHT * 0.5 ) + 195 - OFFSET_WALL * SCALE_WALL, go.EASING_INQUAD, 1, 0.5, function() 
 		msg.post( "camera#screen_shake", "shake", { shake = 10 } )
 		sound.play( "/sounds#thud", { delay = 0, gain = constants.SFX_GAIN } )
 		msg.post( "cursor#cursor_controller", "toggle_input", { val = true } )
@@ -261,7 +261,7 @@ local function create_level( self )
 			set_tutorial_mode( self, TUT_MOVE, 1 )
 		end
 		go.animate( "wall", "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3( SCALE_WALL, SCALE_WALL, 1 ), go.EASING_INQUAD, 0.1, 0, function() end )
-		go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, ( self.S_HEIGHT * 0.5 ) + 200 - OFFSET_WALL * SCALE_WALL, go.EASING_LINEAR, 0.1, 0, function() 
+		go.animate( "wall", "position.y", go.PLAYBACK_ONCE_FORWARD, ( constants.S_HEIGHT * 0.5 ) + 200 - OFFSET_WALL * SCALE_WALL, go.EASING_LINEAR, 0.1, 0, function() 
 			self.game_status = STATUS_ACTIVE
 			if ( self.tutorial_mode ~= TUT_MOVE ) then
 				animate_wall( self, false )
@@ -338,8 +338,8 @@ local function screen_to_world( self, x, y, z, camera )
 	-- The window.get_size() function will return the scaled window size,
 	-- ie taking into account display scaling (Retina screens on macOS for
 	-- instance). We need to adjust for display scaling in our calculation.
-	w = w / (w / self.S_WIDTH)
-	h = h / (h / self.S_HEIGHT)
+	w = w / (w / constants.S_WIDTH)
+	h = h / (h / constants.S_HEIGHT)
 
 	-- https://defold.com/manuals/camera/#converting-mouse-to-world-coordinates
 	local inv = vmath.inv(projection * view)
@@ -354,8 +354,9 @@ end
 
 local function set_zoom( self )
 	local window_width, window_height = window.get_size()
-	local zoom = math.min( window_width / self.S_WIDTH, window_height / self.S_HEIGHT )
-	msg.post( "gui#gui_main", "update_zoom", { zoom = zoom } )
+	local zoom = math.min( window_width / constants.S_WIDTH, window_height / constants.S_HEIGHT )
+	--msg.post( "gui#gui_main", "update_zoom", { zoom = zoom } )
+	zoom = zoom / window.get_display_scale() -- for Defold v1.10.0
 	go.set( "/camera#camera", "orthographic_zoom", zoom )
 end
 
@@ -377,8 +378,6 @@ function on_message(self, message_id, message, sender)
 		math.randomseed( os.time() )
 
 		-- Get screen width and height
-		self.S_WIDTH = tonumber(sys.get_config_int( "display.width" ))
-		self.S_HEIGHT = tonumber(sys.get_config_int( "display.height" ))
 		window.set_listener( window_callback )
 		set_zoom( self )
 

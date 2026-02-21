@@ -5,14 +5,19 @@ An experiment on Defold's joints and physics.
 
 Uses gooey by britzl: https://github.com/britzl/gooey
 
+version 0.0.2
+- Updated zoom function
+
 ]]--
 
 
 local M = {}
 -- Constants
-M.VERSION = "0.0.1"
+M.VERSION = "0.0.2"
 M.SFX_GAIN = 1.0
 M.MUS_GAIN = 0.75
+M.S_WIDTH = sys.get_config_int( "display.width" )
+M.S_HEIGHT = sys.get_config_int( "display.height" )
 M.BODYPARTS = { "body", "leftlowerarm", "leftlowerleg", "leftupperarm", "leftupperleg",
 "rightlowerarm", "rightlowerleg", "rightupperarm", "rightupperleg" }
 M.POSE_TUTORIAL = {body={pos={0,0},rot=0},leftlowerarm={pos={-72.8,-0.05},rot=2.97},leftlowerleg={pos={-107.15,-99.12},rot=-69.08},leftupperarm={pos={-39.82,38.73},rot=-83.73},leftupperleg={pos={-39.89,-73.42},rot=-69.08},rightlowerarm={pos={72.82,0.95},rot=-3.09},rightlowerleg={pos={48.4,-154.32},rot=23.88},rightupperarm={pos={39.87,39.18},rot=84.61},rightupperleg={pos={21.18,-89.84},rot=21.88}}
